@@ -1,0 +1,101 @@
+import { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { AppContext } from "../../Context/AppContext";
+
+export default function Register() {
+
+    const {setToken} = useContext(AppContext)
+    const navigate = useNavigate()
+
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: '',
+        password_confirmation: ''
+    });
+    
+    const [errors, setErrors] = useState({})
+    
+    async function handleRegister(e) {
+        e.preventDefault();
+        const res = await fetch(`api/register`, {
+            method: "post",
+            body: JSON.stringify(formData),
+        });
+
+        const data = await res.json()
+
+        if (data.errors) {
+            setErrors(data.errors)
+        } else
+            localStorage.setItem('token', data.token);
+            setToken(data.token);
+            navigate('/');
+    }
+
+
+    return (
+        <>
+            <h1 className="text-3xl font-bold text-center mb-6 mt-6">Register an Account:</h1>  
+
+            <form 
+                onSubmit={handleRegister} 
+                className="card"
+            >
+                {/* Name Input */}
+                <div>
+                    <input 
+                        type="text" 
+                        placeholder="Name..." 
+                        value={formData.name} 
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+                </div> 
+
+                {/* Email Input */}
+                <div>  
+                    <input 
+                        type="text" 
+                        placeholder="Email..."
+                        value={formData.email} 
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+                </div> 
+
+                {/* Password Input */}
+                <div>  
+                    <input 
+                        type="password" 
+                        placeholder="Password..."
+                        value={formData.password} 
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+                </div>
+
+                {/* Confirm Password Input */}
+                <div>   
+                    <input 
+                        type="password" 
+                        placeholder="Confirm Password..."
+                        value={formData.password_confirmation} 
+                        onChange={(e) => setFormData({ ...formData, password_confirmation: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+
+                {/* Register Button */}
+                <button 
+                    className="w-full bg-blue-600 text-white font-medium rounded-lg px-4 py-2 hover:bg-blue-700 transition"
+                >
+                    Register
+                </button>
+            </form>
+        </>
+    );
+}
